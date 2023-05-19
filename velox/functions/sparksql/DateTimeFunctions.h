@@ -169,7 +169,7 @@ struct MakeDateFunction {
         year,
         month,
         day);
-    result = Date(daysSinceEpoch);
+    result = daysSinceEpoch;
   }
 };
 

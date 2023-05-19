@@ -59,6 +59,11 @@ LogicalType fromVeloxType(const TypePtr& type) {
     auto [precision, scale] = getDecimalPrecisionScale(*type);
     return LogicalType::DECIMAL(precision, scale);
   }
+
+  if (isDateType(type)) {
+    return LogicalType::DATE;
+  }
+
   switch (type->kind()) {
     case TypeKind::BOOLEAN:
       return LogicalType::BOOLEAN;
@@ -81,8 +86,6 @@ LogicalType fromVeloxType(const TypePtr& type) {
       return LogicalType::VARCHAR;
     case TypeKind::TIMESTAMP:
       return LogicalType::TIMESTAMP;
-    case TypeKind::DATE:
-      return LogicalType::DATE;
     case TypeKind::ARRAY:
       return LogicalType::LIST(fromVeloxType(type->childAt(0)));
     case TypeKind::MAP:

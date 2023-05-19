@@ -126,17 +126,6 @@ template <typename T>
 struct MinMaxTrait : public std::numeric_limits<T> {};
 
 template <>
-struct MinMaxTrait<Date> {
-  static constexpr Date lowest() {
-    return Date(std::numeric_limits<int32_t>::min());
-  }
-
-  static constexpr Date max() {
-    return Date(std::numeric_limits<int32_t>::max());
-  }
-};
-
-template <>
 struct MinMaxTrait<Timestamp> {
   static constexpr Timestamp lowest() {
     return Timestamp(std::numeric_limits<int64_t>::min(), 0);
@@ -1108,8 +1097,6 @@ std::unique_ptr<exec::Aggregate> create(
       return std::make_unique<Aggregate<W, double>>(resultType);
     case TypeKind::VARCHAR:
       return std::make_unique<Aggregate<W, StringView>>(resultType);
-    case TypeKind::DATE:
-      return std::make_unique<Aggregate<W, Date>>(resultType);
     case TypeKind::TIMESTAMP:
       return std::make_unique<Aggregate<W, Timestamp>>(resultType);
     default:
@@ -1142,8 +1129,6 @@ std::unique_ptr<exec::Aggregate> create(
     case TypeKind::VARCHAR:
       return create<Aggregate, StringView>(
           resultType, compareType, errorMessage);
-    case TypeKind::DATE:
-      return create<Aggregate, Date>(resultType, compareType, errorMessage);
     case TypeKind::TIMESTAMP:
       return create<Aggregate, Timestamp>(
           resultType, compareType, errorMessage);

@@ -60,10 +60,6 @@ struct Converter<TypeKind::BOOLEAN> {
     return folly::to<T>(v);
   }
 
-  static T cast(const Date& d, bool& nullOutput) {
-    VELOX_UNSUPPORTED("Conversion of Date to Boolean is not supported");
-  }
-
   static T cast(const Timestamp& d, bool& nullOutput) {
     VELOX_UNSUPPORTED("Conversion of Timestamp to Boolean is not supported");
   }
@@ -350,10 +346,6 @@ struct Converter<
     return static_cast<T>(v);
   }
 
-  static T cast(const Date& d, bool& nullOutput) {
-    VELOX_UNSUPPORTED("Conversion of Date to Real or Double is not supported");
-  }
-
   static T cast(const Timestamp& d, bool& nullOutput) {
     VELOX_UNSUPPORTED(
         "Conversion of Timestamp to Real or Double is not supported");
@@ -417,45 +409,6 @@ struct Converter<TypeKind::TIMESTAMP> {
     return fromTimestampString(v.data(), v.size());
   }
 
-  static T cast(const Date& d, bool& nullOutput) {
-    static const int64_t kMillisPerDay{86'400'000};
-    return Timestamp::fromMillis(d.days() * kMillisPerDay);
-  }
-};
-
-// Allow conversions from string to DATE type.
-template <bool TRUNCATE>
-struct Converter<TypeKind::DATE, void, TRUNCATE> {
-  using T = typename TypeTraits<TypeKind::DATE>::NativeType;
-  template <typename From>
-  static T cast(const From& /* v */, bool& nullOutput) {
-    VELOX_UNSUPPORTED("Conversion to Date is not supported");
-    return T();
-  }
-
-  static T cast(folly::StringPiece v, bool& nullOutput) {
-    return fromDateString(v.data(), v.size());
-  }
-
-  static T cast(const StringView& v, bool& nullOutput) {
-    return fromDateString(v.data(), v.size());
-  }
-
-  static T cast(const std::string& v, bool& nullOutput) {
-    return fromDateString(v.data(), v.size());
-  }
-
-  static T cast(const Timestamp& t, bool& nullOutput) {
-    static const int32_t kSecsPerDay{86'400};
-    auto seconds = t.getSeconds();
-    if (seconds >= 0 || seconds % kSecsPerDay == 0) {
-      return Date(seconds / kSecsPerDay);
-    }
-    // For division with negatives, minus 1 to compensate the discarded
-    // fractional part. e.g. -1/86'400 yields 0, yet it should be considered as
-    // -1 day.
-    return Date(seconds / kSecsPerDay - 1);
-  }
 };
 
 } // namespace facebook::velox::util

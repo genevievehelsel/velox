@@ -171,7 +171,7 @@ class TableWriteTest : public HiveConnectorTestBase {
 
     for (auto i = 0; i < partitionKeyValues.size(); i++) {
       if (partitionTypes[i]->isVarchar() || partitionTypes[i]->isVarbinary() ||
-          partitionTypes[i]->isDate()) {
+          isDateType(partitionTypes[i])) {
         conjuncts.push_back(
             partitionKeyValues[i]
                 .replace(partitionKeyValues[i].find("="), 1, "='")
